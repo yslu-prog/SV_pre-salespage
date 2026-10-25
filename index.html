@@ -553,20 +553,65 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
 </section>
 
 <section class="block" id="credentials">
+  <style>
+    .cred-line{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.4fr);gap:28px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:26px 28px}
+    .cred-line + .cred-line{margin-top:16px}
+    .cred-line .lh .pname{font-family:var(--f-mono);font-size:12.5px;letter-spacing:.08em;color:var(--orange-ink)}
+    .cred-line .lh h3{font-size:clamp(20px,2.4vw,24px);font-weight:900;margin-top:4px;color:var(--teal-ink)}
+    .cred-line .lh p{font-size:13.5px;color:var(--muted);margin-top:6px;line-height:1.6}
+    .cred-items{display:grid;gap:12px}
+    .cred-items.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .cred-items.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .ci{display:grid;justify-items:center;gap:6px;text-align:center;padding:14px 8px;border-radius:8px;background:var(--bg);border:1px solid var(--line)}
+    .ci .logo{width:64px;height:64px;border-radius:50%;border:2px solid var(--teal);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:12.5px;color:var(--teal-ink);overflow:hidden}
+    .ci .logo img{width:100%;height:100%;object-fit:contain}
+    .lab-line .ci .logo{border-color:var(--orange);color:var(--orange-ink)}
+    .ci b{font-size:14px;line-height:1.35}
+    .ci span{font-size:12px;color:var(--muted);line-height:1.45}
+    @media (max-width:900px){.cred-line{grid-template-columns:minmax(0,1fr)}}
+    @media (max-width:560px){.cred-items.four,.cred-items.three{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  </style>
   <div class="wrap">
     <div class="sec-head">
       <div class="eyebrow">Credentials</div>
       <h2>資格清單</h2>
-      <p>PCI 相關資格皆可在 PCI SSC 官方名錄查證。</p>
     </div>
-    <div class="creds">
-      <div class="cred"><div class="seal">QSAC</div><b>QSA Company</b><span>PCI SSC 認可稽核機構</span></div>
-      <div class="cred"><div class="seal">QSA</div><b>Qualified Security Assessor</b><span>出具 ROC／AOC</span></div>
-      <div class="cred"><div class="seal">ASV</div><b>Approved Scanning Vendor</b><span>官方認可弱點掃描</span></div>
-      <div class="cred"><div class="seal">3DS</div><b>PCI 3DS Assessor</b><span>EMV 3-D Secure 評估</span></div>
-      <div class="cred"><div class="seal">QPA</div><b>PIN Security</b><span>PIN 交易安全評估</span></div>
-      <div class="cred lab"><div class="seal">17025</div><b>ISO/IEC 17025</b><span>認證資安實驗室</span></div>
+
+    <!-- 第一條線：PCI SSC 認可資格 -->
+    <div class="cred-line">
+      <div class="lh">
+        <div class="pname">PCI SSC</div>
+        <h3>PCI 認可稽核資格</h3>
+        <p>皆可在 PCI SSC 官方名錄查證。</p>
+      </div>
+      <div class="cred-items four">
+        <div class="ci"><div class="logo">QSA</div><b>PCI DSS</b><span>QSA 稽核，出具 ROC／AOC</span></div>
+        <div class="ci"><div class="logo">3DS</div><b>PCI 3DS</b><span>EMV 3-D Secure 評估</span></div>
+        <div class="ci"><div class="logo">PIN</div><b>PIN Security</b><span>PIN 交易安全評估</span></div>
+        <div class="ci"><div class="logo">ASV</div><b>PCI ASV</b><span>官方認可弱點掃描</span></div>
+      </div>
     </div>
+
+    <!-- 第二條線：ISO/IEC 17025 認可資安實驗室 -->
+    <div class="cred-line lab-line">
+      <div class="lh">
+        <div class="pname">ISO/IEC 17025</div>
+        <h3>認可資安實驗室</h3>
+        <p>自有實驗室執行檢測並出具報告。</p>
+      </div>
+      <div class="cred-items three">
+        <div class="ci"><div class="logo">EMVCo</div><b>EMVCo L1–L3</b><span>晶片與終端檢測</span></div>
+        <div class="ci"><div class="logo">PTS</div><b>PCI PTS</b><span>支付終端安全檢測</span></div>
+        <div class="ci"><div class="logo">MPoC</div><b>PCI MPoC</b><span>行動收單方案檢測</span></div>
+      </div>
+    </div>
+
+    <div class="quote">
+      <q>The audit takes 3 days. We're here for 365.</q>
+      <span>稽核只有幾天，合規要維持一整年。</span>
+    </div>
+  </div>
+</section>
     <div class="quote">
       <q>The audit takes 3 days. We're here for 365.</q>
       <span>稽核只有幾天，合規要維持一整年。</span>
@@ -579,12 +624,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
     <div>
       <div class="eyebrow" style="color:#FFB54D">Next Step</div>
       <h2 style="margin-top:8px">合作從免費範圍界定開始</h2>
-      <p>先釐清適用範圍並做技術檢視，再依範圍複雜度、PCI Level、專案階段提供正式報價。</p>
+      <p>先釐清適用範圍及現行技術檢視（如需），再依範圍複雜度、PCI Level、專案階段提供正式報價。</p>
       <div class="flow"><span class="hl">免費範圍界定</span><i>→</i><span class="hl">技術檢視</span><i>→</i><span>正式報價</span><i>→</i><span>啟動專案</span></div>
     </div>
     <div class="contact">
       <div class="it"><span class="k">Email</span><span class="v">service@securevectors.com</span></div>
-      <div class="it"><span class="k">電話</span><span class="v tnum">+886 2-3393-1006</span></div>
       <div class="it"><span class="k">官網</span><a class="v" href="https://www.securevectors.com/contact-us" target="_blank" rel="noopener">securevectors.com/contact-us</a></div>
     </div>
   </div>
