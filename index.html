@@ -242,6 +242,9 @@ a.chip:hover{background:var(--teal);color:var(--on-teal);border-color:var(--teal
   .yb-cal.anim.on .yb-pin{opacity:1}
 }
 .hero-book{margin-top:24px}
+.lh-link{display:block;text-decoration:none;color:inherit}
+.lh-link h3::after{content:" ↗";font-size:.6em;opacity:.7}
+.lh-link:hover h3{text-decoration:underline}
 .plink{display:inline-block;margin-top:10px;font-size:14px;font-weight:700;color:var(--teal-ink);text-decoration:none}
 .plink:hover{text-decoration:underline}
 .next{background:var(--band);color:var(--band-fg)}
@@ -334,8 +337,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
       <dl id="summary">
         <div class="row"><dt>安律國際</dt><dd>Secure Vectors，2010 年成立的 PCI SSC 認可 QSA 審查公司，台灣市占率 70%。</dd></div>
         <div class="row"><dt>產業資格</dt><dd>PCI SSC 認可 PCI DSS、3DS、PIN Security 審查及 ASV 資格；與 Applus+ Laboratories 合作聯盟，支援 EMVCo L1-L3／PCI PTS／MPoC 等檢測。</dd></div>
-        <div class="row"><dt>服務實績</dt><dd>亞太區領先的跨境 PCI DSS 案件，每年完成 300+ 企業驗證。</dd></div>
-        <div class="row"><dt>加值產品</dt><dd><span class="ln">自 2019 年啟用，已實際使用 7 年</span><span class="ln">依企業需求選用、不強制。</span></dd></div>
+        <div class="row"><dt>服務實績</dt><dd>亞太區領先的跨境 PCI DSS 案件，每年完成 300+ 企業合規審查驗證。</dd></div>
+        <div class="row"><dt>加值產品</dt><dd><span class="ln">自 2019 年啟用，已實際使用 7 年。</span><span class="ln">依企業需求選用、不強制。</span></dd></div>
         <div class="row"><dt>下一步</dt><dd>先免費界定範圍並進行技術檢視，再提供正式報價。</dd></div>
       </dl>
     </aside>
@@ -353,7 +356,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
       <div class="proof-text">
         <div class="num">1</div>
         <h3>垂直整合認證需求</h3>
-        <p>PCI SSC 認可 QSAC 審查機構，結合 ISO/IEC 17025 認可資安實驗室資源</p>
+        <p>PCI SSC 認可 QSAC 審查機構，結合 ISO/IEC 17025 認可資安實驗室</p>
         <ul>
           <li><span><b>PCI DSS QSAC 資格：</b>出具正式 ROC／AOC 報告</span></li>
           <li><span><b>PCI ASV 資格：</b>出具正式季度外部弱點掃描報告。</span></li>
@@ -378,7 +381,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
         </ul>
       </div>
       <figure class="visual img-fig" style="margin:0">
-        <button class="zoom" type="button" aria-label="點擊放大圖片"><img src="images/svglobalmap.png" alt="安律國際全球據點：台灣台北（總部）、日本東京、中國北京、香港、新加坡、美國" loading="lazy"><span class="zoom-hint" aria-hidden="true">⤢ 點擊放大</span></button>
+        <button class="zoom" type="button" aria-label="點擊放大圖片"><img src="images/svglobalmap.png" alt="安律國際全球據點：台灣台北（總部）、日本東京、中國北京、香港、新加坡、美國" data-fb="images/svgloblemap_1.png,svgloblemap_1.png" onerror="var f=(this.dataset.fb||'').split(','),n=f.shift();this.dataset.fb=f.join(',');if(n){this.src=n;}else{this.onerror=null;}" loading="lazy"><span class="zoom-hint" aria-hidden="true">⤢ 點擊放大</span></button>
       </figure>
     </div>
 
@@ -480,10 +483,10 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
     }
     .plat-note{font-size:12.5px;color:var(--muted)}
     .plat-duo{display:grid;grid-template-columns:minmax(0,.74fr) minmax(0,1.26fr);gap:20px;margin-top:20px;align-items:stretch}
-    .asv-block{display:grid;gap:20px;align-content:center}
-    .asv-block .plat-title h3{font-size:clamp(20px,2vw,24px)}
+    .asv-block{display:grid;gap:20px;align-content:start}
+    .plat-duo .plat-title h3{font-size:clamp(20px,2vw,24px)}
     .asv-right{display:grid;gap:12px}
-    .collab-block{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:16px;align-items:center}
+    .collab-block{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:16px;align-items:start}
     .collab-viz{position:relative}
     .merge{position:relative;width:100%;aspect-ratio:1280/1010;background:radial-gradient(58% 52% at 50% 46%,color-mix(in srgb,var(--teal) 9%,transparent),transparent 72%)}
     .merge-fig{position:absolute;left:12.73%;top:12.38%;width:74.53%;aspect-ratio:954/672}
@@ -526,7 +529,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
     <div class="sec-head">
       <div class="eyebrow">Compliance Automation</div>
       <h2>Compliance Automation<span style="display:block;font-size:.72em;margin-top:6px;color:var(--teal-ink)">讓合規不只在審查當天合規</span></h2>
-      <p>100% QSA 審查員設計，自 2019 年啟用，已實際使用 7 年。</p>
+      <p>100% QSA 審查員開發設計，自 2019 年啟用，眾多客戶已實際使用並一致認同推薦。</p>
     </div>
 
     <div class="plat-block" id="plat-review">
@@ -568,7 +571,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
             <div class="q"><b>Q3</b><span>已通過</span></div>
             <div class="q next"><b>Q4</b><span>排程中</span></div>
           </div>
-          <p class="plat-note">對應 PCI DSS 每季外部掃描要求（Req. 11.3.2），狀態為示意。</p>
+          <p class="plat-note">對應 PCI DSS 季度外部弱點掃描要求（Req. 11.3.2）</p>
         </div>
       </div>
 
@@ -662,8 +665,10 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
 
     <div class="cred-line lab-line">
       <div class="lh">
-        <div class="pname">ISO/IEC 17025</div>
-        <h3>認可資安實驗室</h3>
+        <a class="lh-link" href="https://securevectorlab.com/zh-hant/payment-fintech" target="_blank" rel="noopener">
+          <div class="pname">ISO/IEC 17025</div>
+          <h3>認可資安實驗室</h3>
+        </a>
         <p>與 Applus+ Laboratories 合作聯盟，支援下列檢測。</p>
       </div>
       <ul class="cred-list">
