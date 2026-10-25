@@ -2,6 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Secure Vectors 與 PCI DSS 服務簡介</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -9,6 +10,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;800&family=IBM+Plex+Mono:wght@500&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
 <style>
 :root{
+  color-scheme:light;
+  --orange-solid:#F08A00; --on-orange:#1B1200;
   --bg:#F3F7F6; --surface:#FFFFFF; --sunk:#E7EFED; --fg:#0F2A2A; --muted:#4D6664; --line:#D3E0DD;
   --teal:#005A5A; --teal-ink:#00706F; --orange:#F08A00; --orange-ink:#B86600; --green:#6E9F2A;
   --on-teal:#FFFFFF; --band:#00494A; --band-fg:#FFFFFF; --band-muted:#B9D6D3; --slip:#FFFFFF; --slip-fg:#0F2A2A;
@@ -18,15 +21,6 @@
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
   --r:10px;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0B1918; --surface:#112423; --sunk:#0E1F1E; --fg:#E4F0EE; --muted:#9DB6B3; --line:#21403D;
-  --teal:#3FB0AA; --teal-ink:#5CC4BE; --orange:#FF9C24; --orange-ink:#FFB04D; --green:#9CCB55;
-  --on-teal:#062020; --band:#06302F; --band-fg:#F2FBFA; --band-muted:#9CC5C1; --slip:#112423; --slip-fg:#E4F0EE; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0B1918; --surface:#112423; --sunk:#0E1F1E; --fg:#E4F0EE; --muted:#9DB6B3; --line:#21403D;
-  --teal:#3FB0AA; --teal-ink:#5CC4BE; --orange:#FF9C24; --orange-ink:#FFB04D; --green:#9CCB55;
-  --on-teal:#062020; --band:#06302F; --band-fg:#F2FBFA; --band-muted:#9CC5C1; --slip:#112423; --slip-fg:#E4F0EE; color-scheme:dark}
-
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.75}
@@ -57,6 +51,7 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--orange);outline-off
 .hero h1 em{display:block;font-style:normal;color:var(--orange);white-space:nowrap;font-size:1.08em}
 .oneline{white-space:nowrap}
 @media (max-width:1060px){.oneline{white-space:normal}}
+.proof-text p.oneline{white-space:normal}
 .hero .lede{margin-top:18px;color:var(--band-muted);max-width:34em;font-size:17px}
 .hero .eyebrow{color:#FFB54D}
 .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 28px;margin-top:36px;max-width:520px}
@@ -83,7 +78,7 @@ section.block + section.block{border-top:1px solid var(--line)}
 .sec-head h2{font-size:clamp(24px,3vw,32px);font-weight:900;margin-top:8px}
 .sec-head p{margin-top:12px;color:var(--muted)}
 
-.proof{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center}
+.proof{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:48px;align-items:center}
 .proof + .proof{margin-top:64px}
 .proof.flip .proof-text{order:2}
 .proof-text h3{font-size:22px;font-weight:900;margin-top:6px}
@@ -96,6 +91,15 @@ section.block + section.block{border-top:1px solid var(--line)}
 .more{display:inline-flex;align-items:center;gap:6px;min-height:44px;margin-top:18px;padding:8px 18px;border-radius:999px;border:1.5px solid var(--teal-ink);color:var(--teal-ink);font-weight:700;text-decoration:none;font-size:14.5px}
 .more:hover{background:var(--teal-ink);color:var(--on-teal)}
 .img-fig{padding:16px;background:#fff}
+.zoom{display:block;position:relative;width:100%;padding:0;border:0;background:none;cursor:zoom-in;border-radius:6px}
+.zoom img{transition:transform .25s ease}
+.zoom:hover img{transform:scale(1.015)}
+.zoom-hint{position:absolute;right:8px;bottom:8px;font-size:12px;font-weight:700;color:#fff;background:rgba(15,42,42,.72);padding:3px 10px;border-radius:999px;opacity:.9}
+dialog.lb{padding:0;border:0;background:transparent;max-width:96vw;max-height:94vh;overflow:visible}
+dialog.lb::backdrop{background:rgba(6,20,20,.82)}
+dialog.lb img{display:block;max-width:96vw;max-height:88vh;width:auto;height:auto;border-radius:8px;background:#fff}
+.lb-close{position:absolute;top:-14px;right:-14px;width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:#0F2A2A;font-size:24px;line-height:1;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.proof.flip .proof-text{order:2}
 .img-fig img{display:block;width:100%;height:auto;border-radius:6px}
 .img-fig figcaption{color:#4D6664}
 .num{font-family:var(--f-mono);font-size:13px;color:var(--orange-ink)}
@@ -129,7 +133,7 @@ section.block + section.block{border-top:1px solid var(--line)}
 /* ===== 5-step cycle ===== */
 .cycle-legend{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;font-size:14px;color:var(--muted);margin-bottom:16px}
 .yr{display:inline-block;font-style:normal;font-family:var(--f-mono);font-size:11.5px;font-weight:500;padding:2px 9px;border-radius:999px;border:1px solid var(--line);background:var(--sunk);color:var(--fg);margin-right:6px}
-.yr.y2{border-color:var(--orange);background:color-mix(in srgb,var(--orange) 12%,var(--surface));color:var(--orange-ink)}
+.yr.y2{border-color:var(--orange-solid);background:var(--orange-solid);color:var(--on-orange)}
 .steps-row{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:30px}
 .st{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px 16px 18px;min-width:0}
 .st.loop{border-color:var(--orange)}
@@ -144,10 +148,12 @@ section.block + section.block{border-top:1px solid var(--line)}
 .loop-inner svg{position:absolute;inset:0 0 auto 0;width:100%;height:52px;overflow:visible}
 .loop-inner path{fill:none;stroke:var(--orange);stroke-width:2;stroke-dasharray:7 6;vector-effect:non-scaling-stroke}
 .loop-inner::before{content:"";position:absolute;top:0;left:15.5%;transform:translateX(-50%);border:7px solid transparent;border-bottom:10px solid var(--orange);border-top:0}
-.loop-label{position:absolute;top:40px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:13px;font-weight:700;color:var(--orange-ink);background:var(--bg);padding:2px 12px;border-radius:999px;border:1px solid var(--orange)}
+.loop-label{position:absolute;top:40px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:13px;font-weight:700;color:var(--on-orange);background:var(--orange-solid);padding:3px 12px;border-radius:999px;border:1px solid var(--orange-solid)}
 @media (prefers-reduced-motion:no-preference){
   .loop-inner path{animation:flow 1.1s linear infinite}
   @keyframes flow{to{stroke-dashoffset:-26}}
+  .st.loop:not(:last-child)::after{animation:nudge 1.3s ease-in-out infinite}
+  @keyframes nudge{0%,100%{transform:translateY(-50%) translateX(-4px);opacity:.45}50%{transform:translateY(-50%) translateX(4px);opacity:1}}
 }
 
 .svc-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:20px;margin-top:32px}
@@ -158,9 +164,16 @@ section.block + section.block{border-top:1px solid var(--line)}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .chip{font-family:var(--f-mono);font-size:12px;padding:4px 10px;border-radius:6px;background:var(--sunk);color:var(--fg);border:1px solid var(--line)}
 .card.main{border-top:4px solid var(--teal)}
+a.chip{text-decoration:none;transition:background .15s ease,color .15s ease,border-color .15s ease}
+a.chip::after{content:" ↗";opacity:.6}
+a.chip:hover{background:var(--teal);color:var(--on-teal);border-color:var(--teal)}
 
 .vfig svg{display:block;width:100%;height:auto;font-family:var(--f-display);filter:drop-shadow(0 14px 26px rgba(0,40,40,.16))}
-.vfig figcaption{margin-top:12px;font-size:12.5px;color:var(--muted)}
+.vdash.anim .arc{stroke-dashoffset:var(--c);transition:stroke-dashoffset 1.4s cubic-bezier(.2,.7,.2,1)}
+.vdash.anim.on .arc{stroke-dashoffset:calc(var(--c) - var(--d))}
+.vdash.anim .ms{opacity:0;transition:opacity .5s ease}
+.vdash.anim.on .ms{opacity:1}
+.vdash.anim.on .ms:nth-of-type(1){transition-delay:.6s}
 .dash{border-radius:var(--r);overflow:hidden;border:1px solid var(--line);background:var(--surface);font-family:var(--f-body)}
 .dash-bar{display:flex;gap:6px;align-items:center;padding:8px 12px;background:var(--sunk);border-bottom:1px solid var(--line)}
 .dash-bar i{width:9px;height:9px;border-radius:50%;background:var(--line)}
@@ -185,7 +198,7 @@ section.block + section.block{border-top:1px solid var(--line)}
 .person .nm{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pct{font-family:var(--f-display);font-weight:800;font-size:11px;padding:2px 7px;border-radius:999px;color:#fff;background:var(--orange)}
 .pct.lag{background:#D64545}
-.callout{position:absolute;font-size:11.5px;font-weight:700;background:var(--orange);color:#1B1200;padding:3px 10px;border-radius:999px;white-space:nowrap;box-shadow:0 4px 10px rgba(0,0,0,.18)}
+.callout{position:absolute;font-size:11.5px;font-weight:700;background:var(--orange-solid);color:var(--on-orange);padding:3px 10px;border-radius:999px;white-space:nowrap;box-shadow:0 4px 10px rgba(0,0,0,.18)}
 .feat-list{display:grid;gap:14px;margin:0;padding:0;list-style:none}
 .feat-list li{padding-left:14px;border-left:3px solid var(--teal)}
 .feat-list b{display:block;font-size:15.5px}
@@ -194,7 +207,7 @@ section.block + section.block{border-top:1px solid var(--line)}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px}
 .kpi .v{font-family:var(--f-display);font-weight:800;font-size:28px;line-height:1;color:var(--teal-ink)}
 .kpi .d{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5}
-.eq{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr);gap:10px;align-items:center;text-align:center;font-size:13.5px}
+.eq{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.3fr) auto minmax(0,1fr);gap:10px;align-items:center;text-align:center;font-size:13.5px}
 .eq .box{padding:14px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);line-height:1.5}
 .eq .box b{display:block;font-size:14.5px}
 .eq .box.o{border-color:var(--orange)}
@@ -205,16 +218,52 @@ section.block + section.block{border-top:1px solid var(--line)}
 .quote q{font-family:var(--f-display);font-weight:800;font-size:clamp(20px,2.6vw,28px);quotes:none;color:var(--fg)}
 .quote span{font-size:14px;color:var(--muted)}
 
+.yearband{padding-block:72px 64px;border-top:1px solid var(--line);text-align:center}
+.yb-quote{font-family:var(--f-display);font-weight:800;font-size:clamp(24px,3.4vw,38px);line-height:1.25;color:var(--fg)}
+.yb-quote em{font-style:normal;color:var(--orange);display:inline-block}
+.yb-sub{margin-top:10px;font-size:16px;color:var(--muted)}
+.yb-cal{position:relative;max-width:780px;margin:64px auto 0}
+.yb-grid{display:grid;grid-template-rows:repeat(7,auto);grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:3px}
+.yb-grid i{display:block;aspect-ratio:1;border-radius:2px;background:var(--teal);opacity:.85}
+.yb-grid i.a{background:var(--orange-solid);opacity:1;box-shadow:0 0 0 1.5px var(--orange-solid)}
+.yb-grid i.a.o{background:color-mix(in srgb,var(--orange-solid) 28%,var(--bg))}
+.yb-pin{position:absolute;bottom:calc(100% + 10px);left:78.3%;transform:translateX(-50%);white-space:nowrap;font-size:13px;font-weight:700;color:var(--on-orange);background:var(--orange-solid);padding:3px 12px;border-radius:999px}
+.yb-pin::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--orange-solid)}
+.yb-scale{display:flex;justify-content:space-between;margin-top:10px;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.yb-legend{display:flex;justify-content:center;flex-wrap:wrap;gap:8px 28px;margin-top:18px;font-size:14px;color:var(--fg)}
+.yb-legend i{display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--teal);margin-right:8px;vertical-align:-1px}
+.yb-legend i.a{background:var(--orange-solid)}
+@media (prefers-reduced-motion:no-preference){
+  .yb-cal.anim .yb-grid i{opacity:0;transition:opacity .35s ease;transition-delay:calc(var(--c) * 22ms)}
+  .yb-cal.anim.on .yb-grid i{opacity:.85}
+  .yb-cal.anim.on .yb-grid i.a{opacity:1}
+  .yb-cal.anim .yb-pin{opacity:0;transition:opacity .4s ease 1.2s}
+  .yb-cal.anim.on .yb-pin{opacity:1}
+}
+.hero-book{margin-top:24px}
+.plink{display:inline-block;margin-top:10px;font-size:14px;font-weight:700;color:var(--teal-ink);text-decoration:none}
+.plink:hover{text-decoration:underline}
 .next{background:var(--band);color:var(--band-fg)}
 .next .wrap{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:40px;padding-block:64px;align-items:center}
 .next h2{font-size:clamp(24px,3vw,32px);font-weight:900}
 .next p{margin-top:12px;color:var(--band-muted);max-width:32em}
 .flow{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;align-items:center;font-size:14px}
 .flow span{padding:6px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.3)}
-.flow span.hl{background:var(--orange);border-color:var(--orange);color:#1B1200;font-weight:700}
+.flow span.hl{background:var(--orange-solid);border-color:var(--orange-solid);color:var(--on-orange);font-weight:700}
 .flow i{font-style:normal;color:var(--band-muted)}
-.btn-book{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin-top:26px;padding:10px 22px;border-radius:999px;background:var(--orange);color:#1B1200;font-weight:700;text-decoration:none;font-size:15px}
+.btn-book{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin-top:26px;padding:10px 22px;border-radius:999px;background:var(--orange-solid);color:var(--on-orange);font-weight:700;text-decoration:none;font-size:15px}
 .btn-book:hover{filter:brightness(1.08)}
+.cal{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.topbar a.btn-sm{display:inline-flex;align-items:center;gap:6px}
+.contact-box{display:grid;gap:22px;justify-items:center;align-content:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:var(--r);padding:28px 22px}
+.contact-box .btn-book{margin-top:0;width:100%;justify-content:center}
+.contact-icons{display:flex;gap:26px;justify-content:center;align-items:flex-start;flex-wrap:wrap}
+.ic-item{display:grid;justify-items:center;gap:10px;text-decoration:none;color:var(--band-fg)}
+.ic-lab{font-size:13px;letter-spacing:.06em;color:var(--band-muted)}
+.ic{display:grid;place-items:center;width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);color:var(--band-fg);transition:background .2s ease,transform .2s ease}
+.ic-item:hover .ic{background:rgba(255,255,255,.18);transform:translateY(-2px)}
+.ic-item:hover .ic-lab{color:var(--band-fg)}
+.ic svg{width:36px;height:36px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .contact{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:var(--r);padding:22px;display:grid;gap:14px}
 .contact .it{display:grid;gap:2px}
 .contact .k{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--band-muted)}
@@ -230,6 +279,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
   .svc-grid{grid-template-columns:minmax(0,1fr)}
   .steps-row{grid-template-columns:minmax(0,1fr);gap:26px}
   .st:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-22px;transform:translateX(-50%)}
+  .st.loop:not(:last-child)::after{animation-name:nudgeDown}
+  @keyframes nudgeDown{0%,100%{transform:translateX(-50%) translateY(-3px);opacity:.45}50%{transform:translateX(-50%) translateY(3px);opacity:1}}
   .loopbar{grid-template-columns:minmax(0,1fr);margin-top:14px}
   .loop-inner{grid-column:1 / -1;height:auto}
   .loop-inner svg,.loop-inner::before{display:none}
@@ -255,7 +306,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
   <div class="wrap">
     <div class="mark">SECURE <b>VECTORS</b> <small>安律國際 · PCI DSS</small></div>
     <!-- 預約連結：取得 Google 日曆預約頁網址後，把下方 href="#booking" 換成該網址，並加上 target="_blank" rel="noopener" -->
-    <a class="btn-sm" href="#booking">預約討論</a>
+    <a class="btn-sm" href="#booking"><svg class="cal" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h2M14 14h2M8 17h2"/></svg>會議預約</a>
   </div>
 </header>
 
@@ -264,12 +315,13 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
     <div>
       <div class="eyebrow">PCI DSS Qualified Security Assessor</div>
       <h1>Dedicated to PCI.<span class="lead-in">Driven by</span><em>Continuous Compliance.</em></h1>
-      <p class="lede">安律國際自 2010 年起深耕 PCI DSS 合規審查。<br>此頁整理與安律國際接洽時最常被問到：<br><span class="oneline">我們是誰、有哪些資格、做過多少案子、能為您做什麼，從哪一步開始。</span></p>
+      <p class="lede">安律國際自 2010 年起深耕 PCI DSS 合規<br>此頁整理安律國際的公司與服務介紹：<br><span class="oneline">我們是誰、有哪些資格、做過多少案子、能為您做什麼，從哪一步開始。</span></p>
+      <a class="btn-book hero-book" href="#booking"><svg class="cal" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h2M14 14h2M8 17h2"/></svg>會議預約</a>
       <div class="stats">
         <div class="stat"><div class="n tnum">16<span>+</span></div><div class="l">年資安專業經驗<br>2010 年成立</div></div>
         <div class="stat"><div class="n tnum">70<span>%</span></div><div class="l">台灣市占率</div></div>
-        <div class="stat"><div class="n tnum">7<span>+</span></div><div class="l">年累計<br>300+企業使用 Compliance Automation </div></div>
-        <div class="stat"><div class="n tnum">300<span>+</span></div><div class="l">每年完成驗證的企業<br>擁有業界最多跨境實績</div></div>
+        <div class="stat"><div class="n tnum">7<span>+</span></div><div class="l">年實際使用<br>Compliance Automation<br>2019 年起啟用</div></div>
+        <div class="stat"><div class="n tnum">300<span>+</span></div><div class="l">每年完成驗證的企業<br>跨境實績亞太區領先</div></div>
       </div>
     </div>
 
@@ -279,10 +331,10 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
         <button class="copy" id="copyBtn" type="button">複製</button>
       </div>
       <dl id="summary">
-        <div class="row"><dt>安律國際</dt><dd>Secure Vectors，2010 年成立的 PCI SSC 認可 QSA 審查公司，台灣市占率 70%</dd></div>
-        <div class="row"><dt>產業資格</dt><dd><span class="ln">PCI SSC 認可 QSA、3DS、QPA（PIN）及 ASV 資格</span><span class="ln">ISO/IEC 17025 認證實驗室：EMVCo／PTS／MPoC 檢測</span></dd></div>
-        <div class="row"><dt>服務實績</dt><dd>業界最多跨境 PCI DSS 案件，每年完成 300+ 企業驗證。</dd></div>
-        <div class="row"><dt>加值產品</dt><dd><span class="ln">300+ 企業以 Compliance Automation 完成審查</span><span class="ln">自 2019 年啟用，依企業需求選用、不強制</span></dd></div>
+        <div class="row"><dt>安律國際</dt><dd>Secure Vectors，2010 年成立的 PCI SSC 認可 QSA 審查公司，台灣市占率 70%。</dd></div>
+        <div class="row"><dt>產業資格</dt><dd>PCI SSC 認可 PCI DSS、3DS、PIN Security 審查及 ASV 資格；與 Applus+ Laboratories 合作聯盟，支援 EMVCo L1-L3／PCI PTS／MPoC 等檢測。</dd></div>
+        <div class="row"><dt>服務實績</dt><dd>亞太區領先的跨境 PCI DSS 案件，每年完成 300+ 企業驗證。</dd></div>
+        <div class="row"><dt>加值產品</dt><dd><span class="ln">自 2019 年啟用，已實際使用 7 年</span><span class="ln">依企業需求選用、不強制。</span></dd></div>
         <div class="row"><dt>下一步</dt><dd>先免費界定範圍並進行技術檢視，再提供正式報價。</dd></div>
       </dl>
     </aside>
@@ -299,53 +351,51 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
     <div class="proof">
       <div class="proof-text">
         <div class="num">1</div>
-        <h3>垂直整合認證需求：合規審查與資安實驗室</h3>
-        <p>PCI SSC 認可 QSAC 審查機構，旗下有 ISO/IEC 17025 認可資安實驗室</p>
+        <h3>垂直整合認證需求</h3>
+        <p>PCI SSC 認可 QSAC 審查機構，結合 ISO/IEC 17025 認可資安實驗室資源</p>
         <ul>
           <li><span><b>PCI DSS QSAC 資格：</b>出具正式 ROC／AOC 報告</span></li>
           <li><span><b>PCI ASV 資格：</b>出具正式季度外部弱點掃描報告。</span></li>
           <li><span><b>PCI 3DS 及 PCI PIN Security</b> 審查資格。</span></li>
-          <li><span><b>自有資安實驗室：</b>直接執行技術測試，出具 PCI PTS、PCI MPoC 及 EMVCo L1–L3 檢測報告（Applus+ Laboratories 聯盟夥伴），無需再轉交外部單位。</span></li>
+          <li><span><b>實驗室聯盟資源：</b>與 Applus+ Laboratories 合作聯盟，支援 PCI PTS、PCI MPoC 及 EMVCo L1–L3 等技術檢測，認證服務一站整合。</span></li>
         </ul>
       </div>
       <figure class="visual img-fig" style="margin:0">
-        <img src="images/certtriangle.png" alt="安律國際資格架構：Management（PCI DSS、PCI 3DS、PIN Security 等）、System Security（EMVCo L3、App Security）、Product Security（EMVCo L1/L2、PCI MPoC、PCI PTS 等），與 Applus+ Laboratories ISO 17025:2017 認證實驗室" loading="lazy">
-        <figcaption>兩種資格同時具備，在亞洲 PCI 審查業者中少見。</figcaption>
+        <button class="zoom" type="button" aria-label="點擊放大圖片"><img src="images/certtriangle.png" alt="安律國際資格架構圖：Management、System Security、Product Security 三層認證範疇" loading="lazy"><span class="zoom-hint" aria-hidden="true">⤢ 點擊放大</span></button>
       </figure>
     </div>
 
     <div class="proof flip">
       <div class="proof-text">
         <div class="num">2</div>
-        <h3>跨境 PCI 經驗業界領先，全球拓展合規首選</h3>
-        <p>具備業界最多的跨國 PCI DSS 案件經驗，由單一夥伴統包多地合規。</p>
+        <h3>跨境 PCI 經驗亞太區領先，全球拓展合規首選</h3>
+        <p>具備亞太區領先的跨國 PCI DSS 案件經驗，由單一夥伴統包多地合規。</p>
         <ul>
-          <li><span><b>完整全球據點：</b>台北、東京、新加坡、北京與美國，在地支援零時差。</span></li>
-          <li><span><b>豐富落地經驗：</b>同業最多跨國案件實績，掌握各市場架構與審查細節。</span></li>
-          <li><span><b>多語溝通服務：</b>支援中、英、日三語，輕鬆搞定亞太至歐美跨區合規。</span></li>
+          <li><span><b>完整全球據點：</b>台北、東京、香港、新加坡、北京與美國，在地支援零時差。</span></li>
+          <li><span><b>豐富落地經驗：</b>亞太區領先的跨國案件實績，掌握各市場架構與審查細節。</span></li>
+          <li><span><b>多語溝通服務：</b>支援中、英、日三語，高效統籌亞太至歐美跨區合規。</span></li>
         </ul>
       </div>
       <figure class="visual img-fig" style="margin:0">
-        <img src="images/svgloblemap.png" alt="安律國際全球據點：台灣台北（總部）、日本東京、中國北京、越南河內、新加坡、美國" loading="lazy">
-        <figcaption>安律國際全球服務據點。</figcaption>
+        <button class="zoom" type="button" aria-label="點擊放大圖片"><img src="images/svglobalmap.png" alt="安律國際全球據點：台灣台北（總部）、日本東京、中國北京、香港、新加坡、美國" loading="lazy"><span class="zoom-hint" aria-hidden="true">⤢ 點擊放大</span></button>
       </figure>
     </div>
 
     <div class="proof">
       <div class="proof-text">
         <div class="num">3</div>
-        <h3>合規自動化平台，經 300+ 企業實戰驗證</h3>
+        <h3>合規自動化平台，經 7 年實戰驗證</h3>
         <p class="oneline">自 2019 年上線，證據提交、QSA 審查與補件一站完成，告別人工追蹤進度。</p>
         <ul>
           <li><span><b>審查高效即時：</b>證據提交後，QSA 於 3 個工作天內快速回覆。</span></li>
           <li><span><b>歷程完整留存：</b>往來紀錄雲端留底，新人接手與隔年複審無縫對接。</span></li>
           <li><span><b>彈性自由選用：</b>依企業需求彈性搭配，無強制綁定限制。</span></li>
+          <li><span><b>平台安全把關：</b>全程傳輸加密與 MFA 登入，結合 IP 白名單及角色權限隔離，審查證據雲端保存 3 年。</span></li>
         </ul>
         <a class="more" href="#platform">了解更多 →</a>
       </div>
       <figure class="visual img-fig" style="margin:0">
-        <img src="images/compliance_Portallaptop.jpg" alt="使用者以筆電操作 SecuCompliance 合規審查平台" loading="lazy">
-        <figcaption>SecuCompliance 平台使用情境。</figcaption>
+        <button class="zoom" type="button" aria-label="點擊放大圖片"><img src="images/compliance_Portallaptop.jpg" alt="使用者以筆電操作 SecuCompliance 合規審查平台" loading="lazy"><span class="zoom-hint" aria-hidden="true">⤢ 點擊放大</span></button>
       </figure>
     </div>
   </div>
@@ -356,7 +406,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
     <div class="sec-head">
       <div class="eyebrow">Services</div>
       <h2>服務範圍</h2>
-      <p>以 PCI DSS 合規審查為主線，首次驗證從範圍界定到出具報告一般約 3–6 個月，實際時程依範圍複雜度而定。</p>
+      <p>以 PCI DSS 合規審查為主線，首次驗證從範圍界定到出具報告一般約 3–6 個月，<br>實際時程依範圍複雜度而定。</p>
     </div>
 
     <p class="cycle-legend"><span><em class="yr">首年</em>STEP 1 → 5 完整進行</span><span><em class="yr y2">每年</em>第二年起從 STEP 3 循環</span></p>
@@ -383,20 +433,22 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
       <div class="card main">
         <div class="lab">主線</div>
         <h3>PCI DSS 合規審查</h3>
-        <p>正式審查並出具 ROC／AOC 報告，並提供 PCI 衍生標準審查與 ASV 弱點掃描。</p>
-        <div class="chips"><span class="chip">PCI DSS</span><span class="chip">PCI 3DS</span><span class="chip">PIN Security</span><span class="chip">PCI ASV 掃描</span><span class="chip">合規輔導諮詢</span></div>
+        <p>正式審查並出具 ROC／AOC 報告，並提供 PCI 相關標準審查與 ASV 弱點掃描。</p>
+        <div class="chips"><a class="chip" href="https://www.securevectors.com/zh-hant/pci-dss" target="_blank" rel="noopener">PCI DSS</a><a class="chip" href="https://www.securevectors.com/zh-hant/pci-3ds" target="_blank" rel="noopener">PCI 3DS</a><a class="chip" href="https://www.securevectors.com/zh-hant/pci-pin-security" target="_blank" rel="noopener">PIN Security</a><a class="chip" href="https://www.securevectors.com/zh-hant/pci-asv-buy-online" target="_blank" rel="noopener">PCI ASV 掃描</a><a class="chip" href="https://www.securevectors.com/zh-hant/pci-dss-consulting" target="_blank" rel="noopener">合規輔導諮詢</a></div>
       </div>
       <div class="card">
         <div class="lab">輔線</div>
         <h3>裝置／軟硬體認證</h3>
-        <p>自有 ISO/IEC 17025 認可資安實驗室執行，結合 Applus+ Laboratories 全球網路資源。</p>
+        <p>ISO/IEC 17025 認可實驗室，與 Applus+ Laboratories 合作聯盟支援。</p>
         <div class="chips"><span class="chip">EMVCo L1–L3</span><span class="chip">PCI PTS</span><span class="chip">PCI MPoC</span><span class="chip">App Security</span><span class="chip">滲透測試</span></div>
+        <a class="plink" href="https://securevectorlab.com/zh-hant/payment-fintech" target="_blank" rel="noopener">前往 securevectorlab ↗</a>
       </div>
       <div class="card">
         <div class="lab">線上工具</div>
         <h3>SAQ DIY 自評平台</h3>
         <p>專為中小型企業與商家設計，透過線上步驟引導，輕鬆快速完成 SAQ 自評問卷。</p>
         <div class="chips"><span class="chip">中小型商家適用</span><span class="chip">步驟式線上指引</span><span class="chip">即時產出自評表</span><span class="chip">降低合規門檻</span></div>
+        <a class="plink" href="https://www.securevectors.com/zh-hant/saq-diy" target="_blank" rel="noopener">前往 SAQ DIY ↗</a>
       </div>
     </div>
   </div>
@@ -408,26 +460,64 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
     .plat-title .pname{font-family:var(--f-mono);font-size:13px;letter-spacing:.08em;color:var(--orange-ink)}
     .plat-title h3{font-size:clamp(26px,3vw,32px);font-weight:900;margin-top:4px;color:var(--teal-ink)}
     .plat-lead{margin-top:6px;color:var(--muted);font-size:15.5px}
+    .plat-points{list-style:none;margin:8px 0 0;padding:0;color:var(--muted);font-size:15.5px;display:grid;gap:2px}
+    .plat-points li::before{content:"・"}
     .plat-main{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:32px;margin-top:22px;align-items:start}
     .plat-side{display:grid;gap:18px}
-    .plat-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:20px}
-    .plat-pair .plat-block{display:flex;flex-direction:column;gap:20px}
+    .plat-pair{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;margin-top:20px}
+    .plat-pair .plat-block{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:center}
+    .asv-right{display:grid;gap:14px}
     .quarters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
     .q{border:1px solid var(--line);border-radius:8px;padding:12px 6px;text-align:center;background:var(--bg)}
     .q b{display:block;font-family:var(--f-display);font-weight:800;font-size:18px}
     .q span{font-size:12px;color:var(--green);font-weight:700}
     .q{background:color-mix(in srgb,var(--green) 10%,var(--bg));border-color:color-mix(in srgb,var(--green) 45%,var(--line))}
-    .q.next{background:var(--orange);border:2px dashed #1B1200;color:#1B1200}
-    .q.next b{color:#1B1200}
-    .q.next span{color:#1B1200}
+    .q.next{position:relative;isolation:isolate;overflow:hidden;background:var(--orange-solid);border:2px dashed var(--on-orange);color:var(--on-orange)}
+    .q.next b,.q.next span{color:var(--on-orange)}
+    @media (prefers-reduced-motion:no-preference){
+      .q.next{border-color:transparent}
+      .q.next::before{content:"";position:absolute;left:50%;top:50%;width:220%;aspect-ratio:1;transform:translate(-50%,-50%) rotate(0deg);background:conic-gradient(from 0deg,transparent 0 45%,var(--on-orange) 100%);animation:qspin 1.5s linear infinite;z-index:-2}
+      .q.next::after{content:"";position:absolute;inset:3px;border-radius:5px;background:var(--orange-solid);z-index:-1}
+      @keyframes qspin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+    }
     .plat-note{font-size:12.5px;color:var(--muted)}
-    @media (max-width:900px){.plat-main,.plat-pair{grid-template-columns:minmax(0,1fr)}}
+    .collab-block{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:32px;align-items:center;margin-top:20px}
+    .collab-eq{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:10px}
+    .collab-eq li{display:grid;grid-template-columns:20px 14px minmax(0,1fr);gap:10px;align-items:start;font-size:14.5px;line-height:1.55;color:var(--muted)}
+    .collab-eq .op{font-family:var(--f-display);font-weight:800;color:var(--muted);text-align:center}
+    .collab-eq .dot{display:block;width:12px;height:12px;border-radius:3px;margin-top:.45em}
+    .collab-eq .dot.b{background:#2F8FD6}.collab-eq .dot.o{background:var(--orange)}.collab-eq .dot.g{background:var(--green)}
+    .collab-eq b{color:var(--fg);margin-right:8px}
+    .collab-viz{position:relative}
+    .merge{position:relative;width:100%;aspect-ratio:1280/1010;background:radial-gradient(58% 52% at 50% 46%,color-mix(in srgb,var(--teal) 9%,transparent),transparent 72%)}
+    .merge-fig{position:absolute;left:12.73%;top:12.38%;width:74.53%;aspect-ratio:954/672}
+    .merge-fig img{position:absolute;display:block;height:auto;max-width:none}
+    .mp-whole{left:0;top:0;width:100%}
+    .mp-blue{left:-11.58%;top:-9.45%;width:100.29%;opacity:0}
+    .mp-orange{left:11.32%;top:5.28%;width:99.91%;opacity:0}
+    .mlab{position:absolute;bottom:2%;transform:translateX(-50%);padding:4px 12px;border-radius:999px;font-size:13px;font-weight:700;white-space:nowrap;border:1px solid transparent}
+    .lab-blue{left:29%;background:#E3F1FB;color:#0B4F7A;border-color:#8DC4EA;opacity:0}
+    .lab-orange{left:71%;background:#FFEFD6;color:#7A4300;border-color:#F2B35A;opacity:0}
+    .lab-done{left:50%;background:color-mix(in srgb,var(--green) 14%,var(--surface));color:#2F4F10;border-color:var(--green);opacity:1}
+    .replay{display:none;position:absolute;top:0;right:0;align-items:center;min-height:44px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--teal-ink);font:700 13px var(--f-body);cursor:pointer}
+    .replay:hover{background:var(--sunk)}
+    .collab-viz.anim .replay{display:inline-flex}
+    .collab-viz.anim:not(.on) .mp-blue{opacity:1;transform:translate(-15.9%,-16.9%)}
+    .collab-viz.anim:not(.on) .mp-orange{opacity:1;transform:translate(15.9%,16.9%)}
+    .collab-viz.anim:not(.on) .mp-whole{opacity:0}
+    .collab-viz.anim:not(.on) .lab-blue,.collab-viz.anim:not(.on) .lab-orange{opacity:1}
+    .collab-viz.anim:not(.on) .lab-done{opacity:0}
+    .collab-viz.anim.on .mp-blue,.collab-viz.anim.on .mp-orange{opacity:0;transform:none;transition:transform 1.9s cubic-bezier(.45,.05,.2,1) .2s,opacity .15s linear 2.1s}
+    .collab-viz.anim.on .mp-whole{opacity:1;transition:opacity .15s linear 2.05s}
+    .collab-viz.anim.on .lab-blue,.collab-viz.anim.on .lab-orange{opacity:0;transition:opacity .3s ease 1.9s}
+    .collab-viz.anim.on .lab-done{opacity:1;transition:opacity .4s ease 2.15s}
+    @media (max-width:900px){.plat-main,.plat-pair .plat-block,.collab-block{grid-template-columns:minmax(0,1fr)}}
   </style>
   <div class="wrap">
     <div class="sec-head">
       <div class="eyebrow">Compliance Automation</div>
       <h2>Compliance Automation<span style="display:block;font-size:.72em;margin-top:6px;color:var(--teal-ink)">讓合規不只在審查當天合規</span></h2>
-      <p>100% QSA 審查員設計，自 2019 年啟用獲 300+ 企業實證認可。</p>
+      <p>100% QSA 審查員設計，自 2019 年啟用，已實際使用 7 年。</p>
     </div>
 
     <div class="plat-block" id="plat-review">
@@ -435,9 +525,10 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
         <div class="pname">SecuCompliance</div>
         <h3>合規審查平台</h3>
         <p class="plat-lead">條文對應、時間對應進度及人員管控集中在同一平台。</p>
+        <a class="plink" href="https://www.securevectors.com/zh-hant/secucompliance" target="_blank" rel="noopener">前往 SecuCompliance ↗</a>
       </div>
       <div class="plat-main">
-        <figure class="vfig" style="margin:0"><svg class="vdash" viewBox="0 0 960 580" role="img" aria-label="SecuCompliance 主控台示意插圖：整體完成度、各組進度環、倒數天數、工作排程與團隊成員進度"><defs><clipPath id="vframe"><rect width="960" height="580" rx="18"/></clipPath></defs><g clip-path="url(#vframe)"><rect width="960" height="580" fill="#F1F5F4"/><rect width="960" height="56" fill="#0A4D46"/><rect y="56" width="180" height="524" fill="#0D5C54"/><text x="24" y="34" font-size="15" font-weight="800" fill="#fff" letter-spacing="1">SEC<tspan fill="#FFB54D">U</tspan>COMPLIANCE</text><rect x="210" y="24" width="90" height="8" rx="4" fill="#fff" opacity=".55"/><rect x="840" y="24" width="56" height="8" rx="4" fill="#fff" opacity=".7"/><circle cx="920" cy="28" r="13" fill="#E9C9A8"/><circle cx="920" cy="25" r="4.4" fill="#8A5A3C"/><path d="M911.9 37.8 a8.1 6.5 0 0 1 16.1 0 z" fill="#F6F1EA"/><rect y="78" width="180" height="38" fill="#fff" opacity=".12"/><rect y="78" width="3" height="38" fill="#FFB54D"/><rect x="24" y="89" width="16" height="16" rx="4" fill="none" stroke="#fff" stroke-width="1.6"/><rect x="52" y="93" width="78" height="8" rx="4" fill="#FFB54D" opacity="1"/><rect x="24" y="133" width="16" height="16" rx="4" fill="none" stroke="#fff" stroke-width="1.6"/><rect x="52" y="137" width="96" height="8" rx="4" fill="#fff" opacity="0.8"/><rect x="24" y="177" width="16" height="16" rx="4" fill="none" stroke="#fff" stroke-width="1.6"/><rect x="52" y="181" width="60" height="8" rx="4" fill="#fff" opacity="0.8"/><rect x="24" y="221" width="16" height="16" rx="4" fill="none" stroke="#fff" stroke-width="1.6"/><rect x="52" y="225" width="84" height="8" rx="4" fill="#fff" opacity="0.8"/><rect x="204" y="80" width="540" height="120" rx="12" fill="#fff"/><rect x="222" y="94" width="70" height="7" rx="3.5" fill="#18A99A" opacity=".75"/><circle cx="258" cy="146" r="32" fill="none" stroke="#E7EFED" stroke-width="8"/><circle cx="258" cy="146" r="32" fill="none" stroke="#18A99A" stroke-width="8" stroke-linecap="round" stroke-dasharray="56.1 201.1" transform="rotate(-90 258 146)"/><text x="258" y="149.5" text-anchor="middle" font-size="13" font-weight="700" fill="#0F2A2A">27.9%</text><circle cx="326" cy="146" r="19" fill="none" stroke="#E7EFED" stroke-width="5"/><circle cx="326" cy="146" r="19" fill="none" stroke="#F5A030" stroke-width="5" stroke-linecap="round" stroke-dasharray="32.9 119.4" transform="rotate(-90 326 146)"/><text x="326" y="149.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#0F2A2A">27.6%</text><circle cx="378" cy="146" r="19" fill="none" stroke="#E7EFED" stroke-width="5"/><circle cx="378" cy="146" r="19" fill="none" stroke="#E8457A" stroke-width="5" stroke-linecap="round" stroke-dasharray="72.7 119.4" transform="rotate(-90 378 146)"/><text x="378" y="149.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#0F2A2A">60.9%</text><circle cx="430" cy="146" r="19" fill="none" stroke="#E7EFED" stroke-width="5"/><circle cx="430" cy="146" r="19" fill="none" stroke="#8E6BE0" stroke-width="5" stroke-linecap="round" stroke-dasharray="25.0 119.4" transform="rotate(-90 430 146)"/><text x="430" y="149.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#0F2A2A">20.9%</text><circle cx="482" cy="146" r="19" fill="none" stroke="#E7EFED" stroke-width="5"/><circle cx="482" cy="146" r="19" fill="none" stroke="#4D8EF0" stroke-width="5" stroke-linecap="round" stroke-dasharray="43.5 119.4" transform="rotate(-90 482 146)"/><text x="482" y="149.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#0F2A2A">36.4%</text><circle cx="534" cy="146" r="19" fill="none" stroke="#E7EFED" stroke-width="5"/><circle cx="534" cy="146" r="19" fill="none" stroke="#31B7C9" stroke-width="5" stroke-linecap="round" stroke-dasharray="51.2 119.4" transform="rotate(-90 534 146)"/><text x="534" y="149.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#0F2A2A">42.9%</text><line x1="566" y1="100" x2="566" y2="186" stroke="#E2E8E6"/><circle cx="608" cy="142" r="30" fill="none" stroke="#22B04B" stroke-width="7"/><text x="608" y="145" text-anchor="middle" font-size="17" font-weight="800" fill="#0F2A2A">146</text><text x="608" y="158" text-anchor="middle" font-size="8" fill="#4D6664">days</text><rect x="652" y="122" width="80" height="17" rx="8.5" fill="#EF4444"/><rect x="664" y="128" width="56" height="5" rx="2.5" fill="#fff" opacity=".85"/><rect x="652" y="146" width="80" height="17" rx="8.5" fill="#EF4444"/><rect x="664" y="152" width="44" height="5" rx="2.5" fill="#fff" opacity=".85"/><rect x="204" y="216" width="540" height="200" rx="12" fill="#fff"/><rect x="222" y="232" width="74" height="8" rx="4" fill="#18A99A" opacity=".75"/><rect x="330.0" y="262" width="39.4" height="140" fill="#E3F4F6"/><rect x="340.0" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><rect x="379.4" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><rect x="408.8" y="262" width="39.4" height="140" fill="#E3F4F6"/><rect x="418.8" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><rect x="458.2" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><rect x="487.6" y="262" width="39.4" height="140" fill="#E3F4F6"/><rect x="497.6" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><rect x="537.0" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><rect x="566.4" y="262" width="39.4" height="140" fill="#E3F4F6"/><rect x="576.4" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><rect x="615.8" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><rect x="645.2" y="262" width="39.4" height="140" fill="#E3F4F6"/><rect x="655.2" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><rect x="694.6" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><line x1="330" y1="262" x2="330" y2="402" stroke="#EF4444" stroke-width="1.5"/><rect x="222" y="273" width="86" height="7" rx="3.5" fill="#D5DEDC"/><rect x="222" y="301" width="74" height="7" rx="3.5" fill="#D5DEDC"/><rect x="222" y="329" width="92" height="7" rx="3.5" fill="#D5DEDC"/><rect x="222" y="357" width="68" height="7" rx="3.5" fill="#D5DEDC"/><rect x="222" y="385" width="80" height="7" rx="3.5" fill="#D5DEDC"/><circle cx="369" cy="276" r="9" fill="#4B5563" stroke="#fff" stroke-width="2"/><circle cx="546" cy="304" r="9" fill="#4B5563" stroke="#fff" stroke-width="2"/><circle cx="558" cy="304" r="9" fill="#3B82F6" stroke="#fff" stroke-width="2"/><circle cx="585" cy="332" r="9" fill="#3B82F6" stroke="#fff" stroke-width="2"/><circle cx="625" cy="360" r="9" fill="#4B5563" stroke="#fff" stroke-width="2"/><circle cx="703" cy="388" r="9" fill="#EF4444" stroke="#fff" stroke-width="2"/><rect x="204" y="432" width="540" height="128" rx="12" fill="#fff"/><rect x="222" y="448" width="90" height="8" rx="4" fill="#18A99A" opacity=".75"/><line x1="222" y1="466" x2="726" y2="466" stroke="#EEF2F1"/><rect x="222" y="479" width="14" height="12" rx="2" fill="#0D5C54"/><rect x="248" y="482" width="210" height="8" rx="4" fill="#D5DEDC"/><rect x="486" y="479" width="52" height="14" rx="7" fill="#22B04B"/><rect x="548" y="479" width="52" height="14" rx="7" fill="#EF4444"/><rect x="610" y="479" width="52" height="14" rx="7" fill="#F5C518"/><circle cx="684" cy="486" r="7" fill="#F26B5B"/><rect x="700" y="480" width="12" height="11" rx="2" fill="none" stroke="#4D6664" stroke-width="1.4"/><line x1="222" y1="506" x2="726" y2="506" stroke="#EEF2F1"/><rect x="222" y="519" width="14" height="12" rx="2" fill="#0D5C54"/><rect x="248" y="522" width="180" height="8" rx="4" fill="#D5DEDC"/><rect x="486" y="519" width="52" height="14" rx="7" fill="#22B04B"/><rect x="548" y="519" width="52" height="14" rx="7" fill="#F26B5B"/><rect x="610" y="519" width="52" height="14" rx="7" fill="#4D8EF0"/><circle cx="684" cy="526" r="7" fill="#4D8EF0"/><rect x="700" y="520" width="12" height="11" rx="2" fill="none" stroke="#4D6664" stroke-width="1.4"/><rect x="764" y="80" width="176" height="480" rx="12" fill="#fff"/><circle cx="796" cy="114" r="15" fill="#4D8EF0"/><circle cx="796" cy="111" r="5.1" fill="#F3D2B3"/><path d="M786.7 125.2 a9.3 7.5 0 0 1 18.6 0 z" fill="#2B4C7E"/><rect x="820" y="106" width="56" height="7" rx="3.5" fill="#B8C6C3"/><rect x="820" y="118" width="42" height="5" rx="2.5" fill="#DDE5E3"/><rect x="882" y="106" width="48" height="16" rx="8" fill="#22B04B"/><text x="906" y="117" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">60.9%</text><circle cx="796" cy="170" r="15" fill="#F6D7B0"/><circle cx="796" cy="167" r="5.1" fill="#C98E66"/><path d="M786.7 181.2 a9.3 7.5 0 0 1 18.6 0 z" fill="#E2733D"/><rect x="820" y="162" width="56" height="7" rx="3.5" fill="#B8C6C3"/><rect x="820" y="174" width="42" height="5" rx="2.5" fill="#DDE5E3"/><rect x="882" y="162" width="48" height="16" rx="8" fill="#F26B5B"/><text x="906" y="173" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">42.3%</text><circle cx="796" cy="226" r="15" fill="#57C29A"/><circle cx="796" cy="223" r="5.1" fill="#F0C8A4"/><path d="M786.7 237.2 a9.3 7.5 0 0 1 18.6 0 z" fill="#2F6FD6"/><rect x="820" y="218" width="56" height="7" rx="3.5" fill="#B8C6C3"/><rect x="820" y="230" width="42" height="5" rx="2.5" fill="#DDE5E3"/><rect x="882" y="218" width="48" height="16" rx="8" fill="#F26B5B"/><text x="906" y="229" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">20.9%</text><circle cx="796" cy="282" r="15" fill="#9B7BD8"/><circle cx="796" cy="279" r="5.1" fill="#7A4E33"/><path d="M786.7 293.2 a9.3 7.5 0 0 1 18.6 0 z" fill="#2E9A6C"/><rect x="820" y="274" width="56" height="7" rx="3.5" fill="#B8C6C3"/><rect x="820" y="286" width="42" height="5" rx="2.5" fill="#DDE5E3"/><rect x="882" y="274" width="48" height="16" rx="8" fill="#F26B5B"/><text x="906" y="285" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">36.4%</text><circle cx="796" cy="338" r="15" fill="#F5C98A"/><circle cx="796" cy="335" r="5.1" fill="#E8B48C"/><path d="M786.7 349.2 a9.3 7.5 0 0 1 18.6 0 z" fill="#33414E"/><rect x="820" y="330" width="56" height="7" rx="3.5" fill="#B8C6C3"/><rect x="820" y="342" width="42" height="5" rx="2.5" fill="#DDE5E3"/><rect x="882" y="330" width="48" height="16" rx="8" fill="#F26B5B"/><text x="906" y="341" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">36.4%</text><circle cx="796" cy="394" r="15" fill="#F7B6C2"/><circle cx="796" cy="391" r="5.1" fill="#7A4E33"/><path d="M786.7 405.2 a9.3 7.5 0 0 1 18.6 0 z" fill="#8E44AD"/><rect x="820" y="386" width="56" height="7" rx="3.5" fill="#B8C6C3"/><rect x="820" y="398" width="42" height="5" rx="2.5" fill="#DDE5E3"/><rect x="882" y="386" width="48" height="16" rx="8" fill="#F26B5B"/><text x="906" y="397" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">42.9%</text></g><rect x=".5" y=".5" width="959" height="579" rx="18" fill="none" stroke="#D3E0DD"/></svg><figcaption>主控台向量示意圖，數值為範例。</figcaption></figure>
+        <figure class="vfig" style="margin:0"><svg class="vdash" id="vdash" viewBox="0 0 960 580" role="img" aria-label="SecuCompliance 主控台示意插圖：整體完成度、各組進度環、倒數天數、工作排程與團隊成員進度"><defs><clipPath id="vframe"><rect width="960" height="580" rx="18"/></clipPath></defs><g clip-path="url(#vframe)"><rect width="960" height="580" fill="#F1F5F4"/><rect width="960" height="56" fill="#0A4D46"/><rect y="56" width="180" height="524" fill="#0D5C54"/><text x="24" y="34" font-size="15" font-weight="800" fill="#fff" letter-spacing="1">SEC<tspan fill="#FFB54D">U</tspan>COMPLIANCE</text><rect x="210" y="24" width="90" height="8" rx="4" fill="#fff" opacity=".55"/><rect x="840" y="24" width="56" height="8" rx="4" fill="#fff" opacity=".7"/><circle cx="920" cy="28" r="13" fill="#E9C9A8"/><circle cx="920" cy="25" r="4.4" fill="#8A5A3C"/><path d="M911.9 37.8 a8.1 6.5 0 0 1 16.1 0 z" fill="#F6F1EA"/><rect y="78" width="180" height="38" fill="#fff" opacity=".12"/><rect y="78" width="3" height="38" fill="#FFB54D"/><rect x="24" y="89" width="16" height="16" rx="4" fill="none" stroke="#fff" stroke-width="1.6"/><text x="50" y="101" font-size="11.5" font-weight="700" fill="#FFB54D">Dashboard</text><rect x="24" y="133" width="16" height="16" rx="4" fill="none" stroke="#fff" stroke-width="1.6"/><text x="50" y="145" font-size="11.5" font-weight="500" fill="#fff">Compliance Management</text><rect x="24" y="177" width="16" height="16" rx="4" fill="none" stroke="#fff" stroke-width="1.6"/><text x="50" y="189" font-size="11.5" font-weight="500" fill="#fff">Settings</text><rect x="24" y="221" width="16" height="16" rx="4" fill="none" stroke="#fff" stroke-width="1.6"/><text x="50" y="233" font-size="11.5" font-weight="500" fill="#fff">Message Center</text><rect x="204" y="80" width="540" height="120" rx="12" fill="#fff"/><rect x="222" y="94" width="70" height="7" rx="3.5" fill="#18A99A" opacity=".75"/><circle cx="258" cy="146" r="32" fill="none" stroke="#E7EFED" stroke-width="8"/><circle cx="258" cy="146" r="32" fill="none" stroke="#18A99A" stroke-width="8" stroke-linecap="round" stroke-dasharray="201.1" style="--c:201.1;--d:56.1" class="arc" transform="rotate(-90 258 146)"/><text x="258" y="149.5" text-anchor="middle" font-size="13" font-weight="700" fill="#0F2A2A">27.9%</text><circle cx="326" cy="146" r="19" fill="none" stroke="#E7EFED" stroke-width="5"/><circle cx="326" cy="146" r="19" fill="none" stroke="#F5A030" stroke-width="5" stroke-linecap="round" stroke-dasharray="119.4" style="--c:119.4;--d:32.9" class="arc" transform="rotate(-90 326 146)"/><text x="326" y="149.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#0F2A2A">27.6%</text><circle cx="378" cy="146" r="19" fill="none" stroke="#E7EFED" stroke-width="5"/><circle cx="378" cy="146" r="19" fill="none" stroke="#E8457A" stroke-width="5" stroke-linecap="round" stroke-dasharray="119.4" style="--c:119.4;--d:72.7" class="arc" transform="rotate(-90 378 146)"/><text x="378" y="149.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#0F2A2A">60.9%</text><circle cx="430" cy="146" r="19" fill="none" stroke="#E7EFED" stroke-width="5"/><circle cx="430" cy="146" r="19" fill="none" stroke="#8E6BE0" stroke-width="5" stroke-linecap="round" stroke-dasharray="119.4" style="--c:119.4;--d:25.0" class="arc" transform="rotate(-90 430 146)"/><text x="430" y="149.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#0F2A2A">20.9%</text><circle cx="482" cy="146" r="19" fill="none" stroke="#E7EFED" stroke-width="5"/><circle cx="482" cy="146" r="19" fill="none" stroke="#4D8EF0" stroke-width="5" stroke-linecap="round" stroke-dasharray="119.4" style="--c:119.4;--d:43.5" class="arc" transform="rotate(-90 482 146)"/><text x="482" y="149.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#0F2A2A">36.4%</text><circle cx="534" cy="146" r="19" fill="none" stroke="#E7EFED" stroke-width="5"/><circle cx="534" cy="146" r="19" fill="none" stroke="#31B7C9" stroke-width="5" stroke-linecap="round" stroke-dasharray="119.4" style="--c:119.4;--d:51.2" class="arc" transform="rotate(-90 534 146)"/><text x="534" y="149.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#0F2A2A">42.9%</text><line x1="566" y1="100" x2="566" y2="186" stroke="#E2E8E6"/><circle cx="608" cy="142" r="30" fill="none" stroke="#22B04B" stroke-width="7"/><text x="608" y="145" text-anchor="middle" font-size="17" font-weight="800" fill="#0F2A2A" id="vcount">146</text><text x="608" y="158" text-anchor="middle" font-size="8" fill="#4D6664">days</text><rect x="652" y="122" width="80" height="17" rx="8.5" fill="#EF4444"/><rect x="664" y="128" width="56" height="5" rx="2.5" fill="#fff" opacity=".85"/><rect x="652" y="146" width="80" height="17" rx="8.5" fill="#EF4444"/><rect x="664" y="152" width="44" height="5" rx="2.5" fill="#fff" opacity=".85"/><rect x="204" y="216" width="540" height="200" rx="12" fill="#fff"/><rect x="222" y="232" width="74" height="8" rx="4" fill="#18A99A" opacity=".75"/><rect x="330.0" y="262" width="39.4" height="140" fill="#E3F4F6"/><rect x="340.0" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><rect x="379.4" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><rect x="408.8" y="262" width="39.4" height="140" fill="#E3F4F6"/><rect x="418.8" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><rect x="458.2" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><rect x="487.6" y="262" width="39.4" height="140" fill="#E3F4F6"/><rect x="497.6" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><rect x="537.0" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><rect x="566.4" y="262" width="39.4" height="140" fill="#E3F4F6"/><rect x="576.4" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><rect x="615.8" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><rect x="645.2" y="262" width="39.4" height="140" fill="#E3F4F6"/><rect x="655.2" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><rect x="694.6" y="250" width="20" height="5" rx="2.5" fill="#C9D5D2"/><line x1="330" y1="262" x2="330" y2="402" stroke="#EF4444" stroke-width="1.5"/><rect x="222" y="273" width="86" height="7" rx="3.5" fill="#D5DEDC"/><rect x="222" y="301" width="74" height="7" rx="3.5" fill="#D5DEDC"/><rect x="222" y="329" width="92" height="7" rx="3.5" fill="#D5DEDC"/><rect x="222" y="357" width="68" height="7" rx="3.5" fill="#D5DEDC"/><rect x="222" y="385" width="80" height="7" rx="3.5" fill="#D5DEDC"/><circle cx="369" cy="276" r="9" fill="#4B5563" stroke="#fff" stroke-width="2" class="ms"/><circle cx="546" cy="304" r="9" fill="#4B5563" stroke="#fff" stroke-width="2" class="ms"/><circle cx="558" cy="304" r="9" fill="#3B82F6" stroke="#fff" stroke-width="2" class="ms"/><circle cx="585" cy="332" r="9" fill="#3B82F6" stroke="#fff" stroke-width="2" class="ms"/><circle cx="625" cy="360" r="9" fill="#4B5563" stroke="#fff" stroke-width="2" class="ms"/><circle cx="703" cy="388" r="9" fill="#EF4444" stroke="#fff" stroke-width="2" class="ms"/><rect x="204" y="432" width="540" height="128" rx="12" fill="#fff"/><rect x="222" y="448" width="90" height="8" rx="4" fill="#18A99A" opacity=".75"/><line x1="222" y1="466" x2="726" y2="466" stroke="#EEF2F1"/><rect x="222" y="479" width="14" height="12" rx="2" fill="#0D5C54"/><rect x="248" y="482" width="210" height="8" rx="4" fill="#D5DEDC"/><rect x="486" y="479" width="52" height="14" rx="7" fill="#22B04B"/><rect x="548" y="479" width="52" height="14" rx="7" fill="#EF4444"/><rect x="610" y="479" width="52" height="14" rx="7" fill="#F5C518"/><circle cx="684" cy="486" r="7" fill="#F26B5B"/><rect x="700" y="480" width="12" height="11" rx="2" fill="none" stroke="#4D6664" stroke-width="1.4"/><line x1="222" y1="506" x2="726" y2="506" stroke="#EEF2F1"/><rect x="222" y="519" width="14" height="12" rx="2" fill="#0D5C54"/><rect x="248" y="522" width="180" height="8" rx="4" fill="#D5DEDC"/><rect x="486" y="519" width="52" height="14" rx="7" fill="#22B04B"/><rect x="548" y="519" width="52" height="14" rx="7" fill="#F26B5B"/><rect x="610" y="519" width="52" height="14" rx="7" fill="#4D8EF0"/><circle cx="684" cy="526" r="7" fill="#4D8EF0"/><rect x="700" y="520" width="12" height="11" rx="2" fill="none" stroke="#4D6664" stroke-width="1.4"/><rect x="764" y="80" width="176" height="480" rx="12" fill="#fff"/><circle cx="796" cy="114" r="15" fill="#4D8EF0"/><circle cx="796" cy="111" r="5.1" fill="#F3D2B3"/><path d="M786.7 125.2 a9.3 7.5 0 0 1 18.6 0 z" fill="#2B4C7E"/><rect x="820" y="106" width="56" height="7" rx="3.5" fill="#B8C6C3"/><rect x="820" y="118" width="42" height="5" rx="2.5" fill="#DDE5E3"/><rect x="882" y="106" width="48" height="16" rx="8" fill="#22B04B"/><text x="906" y="117" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">60.9%</text><circle cx="796" cy="170" r="15" fill="#F6D7B0"/><circle cx="796" cy="167" r="5.1" fill="#C98E66"/><path d="M786.7 181.2 a9.3 7.5 0 0 1 18.6 0 z" fill="#E2733D"/><rect x="820" y="162" width="56" height="7" rx="3.5" fill="#B8C6C3"/><rect x="820" y="174" width="42" height="5" rx="2.5" fill="#DDE5E3"/><rect x="882" y="162" width="48" height="16" rx="8" fill="#F26B5B"/><text x="906" y="173" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">42.3%</text><circle cx="796" cy="226" r="15" fill="#57C29A"/><circle cx="796" cy="223" r="5.1" fill="#F0C8A4"/><path d="M786.7 237.2 a9.3 7.5 0 0 1 18.6 0 z" fill="#2F6FD6"/><rect x="820" y="218" width="56" height="7" rx="3.5" fill="#B8C6C3"/><rect x="820" y="230" width="42" height="5" rx="2.5" fill="#DDE5E3"/><rect x="882" y="218" width="48" height="16" rx="8" fill="#F26B5B"/><text x="906" y="229" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">20.9%</text><circle cx="796" cy="282" r="15" fill="#9B7BD8"/><circle cx="796" cy="279" r="5.1" fill="#7A4E33"/><path d="M786.7 293.2 a9.3 7.5 0 0 1 18.6 0 z" fill="#2E9A6C"/><rect x="820" y="274" width="56" height="7" rx="3.5" fill="#B8C6C3"/><rect x="820" y="286" width="42" height="5" rx="2.5" fill="#DDE5E3"/><rect x="882" y="274" width="48" height="16" rx="8" fill="#F26B5B"/><text x="906" y="285" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">36.4%</text><circle cx="796" cy="338" r="15" fill="#F5C98A"/><circle cx="796" cy="335" r="5.1" fill="#E8B48C"/><path d="M786.7 349.2 a9.3 7.5 0 0 1 18.6 0 z" fill="#33414E"/><rect x="820" y="330" width="56" height="7" rx="3.5" fill="#B8C6C3"/><rect x="820" y="342" width="42" height="5" rx="2.5" fill="#DDE5E3"/><rect x="882" y="330" width="48" height="16" rx="8" fill="#F26B5B"/><text x="906" y="341" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">36.4%</text><circle cx="796" cy="394" r="15" fill="#F7B6C2"/><circle cx="796" cy="391" r="5.1" fill="#7A4E33"/><path d="M786.7 405.2 a9.3 7.5 0 0 1 18.6 0 z" fill="#8E44AD"/><rect x="820" y="386" width="56" height="7" rx="3.5" fill="#B8C6C3"/><rect x="820" y="398" width="42" height="5" rx="2.5" fill="#DDE5E3"/><rect x="882" y="386" width="48" height="16" rx="8" fill="#F26B5B"/><text x="906" y="397" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">42.9%</text></g><rect x=".5" y=".5" width="959" height="579" rx="18" fill="none" stroke="#D3E0DD"/></svg></figure>
 
         <div class="plat-side">
           <ul class="feat-list">
@@ -446,8 +537,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
             <li><b>人員管理</b><span>依角色分派任務、追蹤團隊成員進度</span></li>
           </ul>
           <div class="kpis">
-            <div class="kpi"><div class="v tnum">90%</div><div class="d">溝通成本最多降低</div></div>
-            <div class="kpi"><div class="v tnum">3 天</div><div class="d">QSA 回覆證據（工作天）</div></div>
+            <div class="kpi"><div class="v tnum">90%</div><div class="d">減少溝通與協調成本</div></div>
+            <div class="kpi"><div class="v tnum">3 天</div><div class="d">QSA 回覆證據</div></div>
           </div>
         </div>
       </div>
@@ -459,38 +550,57 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
           <div class="pname">PCI ASV</div>
           <h3>ASV 季度弱點掃描平台</h3>
           <p class="plat-lead">線上申購、排程每季外部弱點掃描，直接取得 ASV 掃描報告。</p>
+          <a class="plink" href="https://www.securevectors.com/zh-hant/pci-asv-buy-online" target="_blank" rel="noopener">前往 Secure Vectors ASV ↗</a>
         </div>
-        <div class="quarters" aria-label="四季掃描狀態示意">
-          <div class="q"><b>Q1</b><span>已通過</span></div>
-          <div class="q"><b>Q2</b><span>已通過</span></div>
-          <div class="q"><b>Q3</b><span>已通過</span></div>
-          <div class="q next"><b>Q4</b><span>排程中</span></div>
-        </div>
-        <p class="plat-note">對應 PCI DSS 每季外部掃描要求（Req. 11.3.2），狀態為示意。</p>
-      </div>
-
-      <div class="plat-block">
-        <div class="plat-title">
-          <div class="pname">SecuCollab</div>
-          <h3>主機代管與定期檢查</h3>
-          <p class="plat-lead">自動化技術測試執行</p>
-        </div>
-        <div class="eq" aria-label="企業營運環境加上 SecuCollab 等於 PCI DSS 合規">
-          <div class="box"><b>企業營運環境</b>專注支付業務</div>
-          <div class="op">+</div>
-          <div class="box o"><b>SecuCollab</b>合規代管+技術檢測</div>
-          <div class="op">=</div>
-          <div class="box g"><b>PCI DSS 合規</b>365 天全年維持</div>
+        <div class="asv-right">
+          <div class="quarters" aria-label="四季掃描狀態示意">
+            <div class="q"><b>Q1</b><span>已通過</span></div>
+            <div class="q"><b>Q2</b><span>已通過</span></div>
+            <div class="q"><b>Q3</b><span>已通過</span></div>
+            <div class="q next"><b>Q4</b><span>排程中</span></div>
+          </div>
+          <p class="plat-note">對應 PCI DSS 每季外部掃描要求（Req. 11.3.2），狀態為示意。</p>
         </div>
       </div>
     </div>
+
+    <div class="plat-block collab-block">
+      <div class="collab-text">
+        <div class="plat-title">
+          <div class="pname">SecuCollab</div>
+          <h3>合規共管平台</h3>
+          <ul class="plat-points"><li>主機代管與定期檢查</li><li>自動化技術測試執行</li></ul>
+          <a class="plink" href="https://www.securevectors.com/zh-hant/secucollab" target="_blank" rel="noopener">前往 SecuCollab ↗</a>
+        </div>
+        <ul class="collab-eq" aria-label="企業營運環境加上 SecuCollab 等於 PCI DSS 合規">
+          <li><span class="op"></span><i class="dot b"></i><span><b>企業營運環境</b>專注支付業務</span></li>
+          <li><span class="op">+</span><i class="dot o"></i><span><b>SecuCollab</b>合規代管+技術檢測</span></li>
+          <li><span class="op">=</span><i class="dot g"></i><span><b>PCI DSS 合規</b>365 天全年維持</span></li>
+        </ul>
+      </div>
+      <div class="collab-viz" id="collabViz">
+        <div class="merge" role="img" aria-label="藍色拼塊代表企業營運環境，橘色拼塊代表 SecuCollab 合規環境，兩者拼合成 PCI DSS 合規">
+          <div class="merge-fig">
+            <img class="mp-whole" src="images/collab-merged.png" alt="">
+            <img class="mp-blue" src="images/collab-blue.png" alt="">
+            <img class="mp-orange" src="images/collab-orange.png" alt="">
+          </div>
+          <span class="mlab lab-blue">企業營運環境</span>
+          <span class="mlab lab-orange">SecuCollab 合規環境</span>
+          <span class="mlab lab-done">PCI DSS 合規</span>
+        </div>
+        <button class="replay" type="button">↻ 重播動畫</button>
+      </div>
+    </div>
   </div>
+
 </section>
 
 <section class="block" id="credentials">
   <style>
-    .cred-line{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.4fr);gap:28px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:26px 28px}
-    .cred-line + .cred-line{margin-top:16px}
+    .creds-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:stretch}
+    .cred-line{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-content:start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:26px 28px}
+
     .cred-line .lh .pname{font-family:var(--f-mono);font-size:12.5px;letter-spacing:.08em;color:var(--orange-ink)}
     .cred-line .lh h3{font-size:clamp(20px,2.4vw,24px);font-weight:900;margin-top:4px;color:var(--teal-ink)}
     .cred-line .lh p{font-size:13.5px;color:var(--muted);margin-top:6px;line-height:1.6}
@@ -503,8 +613,15 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
     .lab-line .ci .logo{border-color:var(--orange);color:var(--orange-ink)}
     .ci b{font-size:14px;line-height:1.35}
     .ci span{font-size:12px;color:var(--muted);line-height:1.45}
-    @media (max-width:900px){.cred-line{grid-template-columns:minmax(0,1fr)}}
-    @media (max-width:560px){.cred-items.four,.cred-items.three{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:900px){.creds-pair{grid-template-columns:minmax(0,1fr)}}
+    .cred-list{list-style:none;margin:0;padding:0;display:grid;border-top:1px solid var(--line)}
+    .cred-list li>a,.cred-list li>div{display:grid;grid-template-columns:9.5em minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:12px 4px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--fg)}
+    .cred-list b{font-size:15.5px}
+    .cred-list span{font-size:14px;color:var(--muted)}
+    .cred-list i{font-style:normal;color:var(--teal-ink);font-weight:700}
+    .cred-list li>a:hover{background:var(--bg)}
+    .cred-list li>a:hover b{color:var(--teal-ink)}
+    @media (max-width:560px){.cred-list li>a,.cred-list li>div{grid-template-columns:minmax(0,1fr) auto}.cred-list span{grid-column:1}}
   </style>
   <div class="wrap">
     <div class="sec-head">
@@ -512,37 +629,48 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
       <h2>資格清單</h2>
     </div>
 
+    <div class="creds-pair">
     <div class="cred-line">
       <div class="lh">
         <div class="pname">PCI SSC</div>
         <h3>PCI 認可審查資格</h3>
-        <p>皆可在 PCI SSC 官方名錄查證。</p>
+        <p>皆可在 PCI SSC 官方名錄查證，點選項目即可前往。</p>
       </div>
-      <div class="cred-items four">
-        <div class="ci"><div class="logo">QSA</div><b>PCI DSS</b><span>QSA 審查，出具 ROC／AOC</span></div>
-        <div class="ci"><div class="logo">3DS</div><b>PCI 3DS</b><span>EMV 3-D Secure 評估</span></div>
-        <div class="ci"><div class="logo">PIN</div><b>PIN Security</b><span>PIN 交易安全評估</span></div>
-        <div class="ci"><div class="logo">ASV</div><b>PCI ASV</b><span>官方認可弱點掃描</span></div>
-      </div>
+      <ul class="cred-list">
+        <li><a href="https://www.pcisecuritystandards.org/assessors_and_solutions/qualified_security_assessors/" target="_blank" rel="noopener"><b>PCI DSS</b><span>支付卡資料安全評估</span><i>↗</i></a></li>
+        <li><a href="https://www.pcisecuritystandards.org/assessors_and_solutions/3ds_assessors/" target="_blank" rel="noopener"><b>PCI 3DS</b><span>EMV 3-D Secure 評估</span><i>↗</i></a></li>
+        <li><a href="https://www.pcisecuritystandards.org/assessors_and_solutions/qpa_assessors/" target="_blank" rel="noopener"><b>PIN Security</b><span>PIN 交易安全評估</span><i>↗</i></a></li>
+        <li><a href="https://www.pcisecuritystandards.org/assessors_and_solutions/approved_scanning_vendors/" target="_blank" rel="noopener"><b>PCI ASV</b><span>核可掃描廠商</span><i>↗</i></a></li>
+      </ul>
     </div>
 
     <div class="cred-line lab-line">
       <div class="lh">
         <div class="pname">ISO/IEC 17025</div>
         <h3>認可資安實驗室</h3>
-        <p>自有實驗室執行檢測並出具報告。</p>
+        <p>與 Applus+ Laboratories 合作聯盟，支援下列檢測。</p>
       </div>
-      <div class="cred-items three">
-        <div class="ci"><div class="logo">EMVCo</div><b>EMVCo L1–L3</b><span>晶片與終端檢測</span></div>
-        <div class="ci"><div class="logo">PTS</div><b>PCI PTS</b><span>支付終端安全檢測</span></div>
-        <div class="ci"><div class="logo">MPoC</div><b>PCI MPoC</b><span>行動收單方案檢測</span></div>
-      </div>
+      <ul class="cred-list">
+        <li><div><b>EMVCo L1–L3</b><span>晶片與終端檢測</span></div></li>
+        <li><div><b>PCI PTS</b><span>支付終端安全檢測</span></div></li>
+        <li><div><b>PCI MPoC</b><span>行動收單方案檢測</span></div></li>
+      </ul>
+    </div>
     </div>
 
-    <div class="quote">
-      <q>The audit takes 3 days. We're here for 365.</q>
-      <span>審查只有3-7天，合規要維持一整年365天。</span>
+  </div>
+</section>
+
+<section class="yearband" aria-labelledby="yb-title">
+  <div class="wrap">
+    <p class="yb-quote" id="yb-title">The audit takes a few days. <em>We're here for 365.</em></p>
+    <p class="yb-sub">審查只有5-7天，合規要維持一整年365天。</p>
+    <div class="yb-cal" id="ybar">
+      <span class="yb-pin">審查 5–7 天</span>
+      <div class="yb-grid" role="img" aria-label="一年 365 天的日曆格，只有 5 到 7 格是審查期，其餘都是需要持續維持合規的日子"><i style="--c:0"></i><i style="--c:0"></i><i style="--c:0"></i><i style="--c:0"></i><i style="--c:0"></i><i style="--c:0"></i><i style="--c:0"></i><i style="--c:1"></i><i style="--c:1"></i><i style="--c:1"></i><i style="--c:1"></i><i style="--c:1"></i><i style="--c:1"></i><i style="--c:1"></i><i style="--c:2"></i><i style="--c:2"></i><i style="--c:2"></i><i style="--c:2"></i><i style="--c:2"></i><i style="--c:2"></i><i style="--c:2"></i><i style="--c:3"></i><i style="--c:3"></i><i style="--c:3"></i><i style="--c:3"></i><i style="--c:3"></i><i style="--c:3"></i><i style="--c:3"></i><i style="--c:4"></i><i style="--c:4"></i><i style="--c:4"></i><i style="--c:4"></i><i style="--c:4"></i><i style="--c:4"></i><i style="--c:4"></i><i style="--c:5"></i><i style="--c:5"></i><i style="--c:5"></i><i style="--c:5"></i><i style="--c:5"></i><i style="--c:5"></i><i style="--c:5"></i><i style="--c:6"></i><i style="--c:6"></i><i style="--c:6"></i><i style="--c:6"></i><i style="--c:6"></i><i style="--c:6"></i><i style="--c:6"></i><i style="--c:7"></i><i style="--c:7"></i><i style="--c:7"></i><i style="--c:7"></i><i style="--c:7"></i><i style="--c:7"></i><i style="--c:7"></i><i style="--c:8"></i><i style="--c:8"></i><i style="--c:8"></i><i style="--c:8"></i><i style="--c:8"></i><i style="--c:8"></i><i style="--c:8"></i><i style="--c:9"></i><i style="--c:9"></i><i style="--c:9"></i><i style="--c:9"></i><i style="--c:9"></i><i style="--c:9"></i><i style="--c:9"></i><i style="--c:10"></i><i style="--c:10"></i><i style="--c:10"></i><i style="--c:10"></i><i style="--c:10"></i><i style="--c:10"></i><i style="--c:10"></i><i style="--c:11"></i><i style="--c:11"></i><i style="--c:11"></i><i style="--c:11"></i><i style="--c:11"></i><i style="--c:11"></i><i style="--c:11"></i><i style="--c:12"></i><i style="--c:12"></i><i style="--c:12"></i><i style="--c:12"></i><i style="--c:12"></i><i style="--c:12"></i><i style="--c:12"></i><i style="--c:13"></i><i style="--c:13"></i><i style="--c:13"></i><i style="--c:13"></i><i style="--c:13"></i><i style="--c:13"></i><i style="--c:13"></i><i style="--c:14"></i><i style="--c:14"></i><i style="--c:14"></i><i style="--c:14"></i><i style="--c:14"></i><i style="--c:14"></i><i style="--c:14"></i><i style="--c:15"></i><i style="--c:15"></i><i style="--c:15"></i><i style="--c:15"></i><i style="--c:15"></i><i style="--c:15"></i><i style="--c:15"></i><i style="--c:16"></i><i style="--c:16"></i><i style="--c:16"></i><i style="--c:16"></i><i style="--c:16"></i><i style="--c:16"></i><i style="--c:16"></i><i style="--c:17"></i><i style="--c:17"></i><i style="--c:17"></i><i style="--c:17"></i><i style="--c:17"></i><i style="--c:17"></i><i style="--c:17"></i><i style="--c:18"></i><i style="--c:18"></i><i style="--c:18"></i><i style="--c:18"></i><i style="--c:18"></i><i style="--c:18"></i><i style="--c:18"></i><i style="--c:19"></i><i style="--c:19"></i><i style="--c:19"></i><i style="--c:19"></i><i style="--c:19"></i><i style="--c:19"></i><i style="--c:19"></i><i style="--c:20"></i><i style="--c:20"></i><i style="--c:20"></i><i style="--c:20"></i><i style="--c:20"></i><i style="--c:20"></i><i style="--c:20"></i><i style="--c:21"></i><i style="--c:21"></i><i style="--c:21"></i><i style="--c:21"></i><i style="--c:21"></i><i style="--c:21"></i><i style="--c:21"></i><i style="--c:22"></i><i style="--c:22"></i><i style="--c:22"></i><i style="--c:22"></i><i style="--c:22"></i><i style="--c:22"></i><i style="--c:22"></i><i style="--c:23"></i><i style="--c:23"></i><i style="--c:23"></i><i style="--c:23"></i><i style="--c:23"></i><i style="--c:23"></i><i style="--c:23"></i><i style="--c:24"></i><i style="--c:24"></i><i style="--c:24"></i><i style="--c:24"></i><i style="--c:24"></i><i style="--c:24"></i><i style="--c:24"></i><i style="--c:25"></i><i style="--c:25"></i><i style="--c:25"></i><i style="--c:25"></i><i style="--c:25"></i><i style="--c:25"></i><i style="--c:25"></i><i style="--c:26"></i><i style="--c:26"></i><i style="--c:26"></i><i style="--c:26"></i><i style="--c:26"></i><i style="--c:26"></i><i style="--c:26"></i><i style="--c:27"></i><i style="--c:27"></i><i style="--c:27"></i><i style="--c:27"></i><i style="--c:27"></i><i style="--c:27"></i><i style="--c:27"></i><i style="--c:28"></i><i style="--c:28"></i><i style="--c:28"></i><i style="--c:28"></i><i style="--c:28"></i><i style="--c:28"></i><i style="--c:28"></i><i style="--c:29"></i><i style="--c:29"></i><i style="--c:29"></i><i style="--c:29"></i><i style="--c:29"></i><i style="--c:29"></i><i style="--c:29"></i><i style="--c:30"></i><i style="--c:30"></i><i style="--c:30"></i><i style="--c:30"></i><i style="--c:30"></i><i style="--c:30"></i><i style="--c:30"></i><i style="--c:31"></i><i style="--c:31"></i><i style="--c:31"></i><i style="--c:31"></i><i style="--c:31"></i><i style="--c:31"></i><i style="--c:31"></i><i style="--c:32"></i><i style="--c:32"></i><i style="--c:32"></i><i style="--c:32"></i><i style="--c:32"></i><i style="--c:32"></i><i style="--c:32"></i><i style="--c:33"></i><i style="--c:33"></i><i style="--c:33"></i><i style="--c:33"></i><i style="--c:33"></i><i style="--c:33"></i><i style="--c:33"></i><i style="--c:34"></i><i style="--c:34"></i><i style="--c:34"></i><i style="--c:34"></i><i style="--c:34"></i><i style="--c:34"></i><i style="--c:34"></i><i style="--c:35"></i><i style="--c:35"></i><i style="--c:35"></i><i style="--c:35"></i><i style="--c:35"></i><i style="--c:35"></i><i style="--c:35"></i><i style="--c:36"></i><i style="--c:36"></i><i style="--c:36"></i><i style="--c:36"></i><i style="--c:36"></i><i style="--c:36"></i><i style="--c:36"></i><i style="--c:37"></i><i style="--c:37"></i><i style="--c:37"></i><i style="--c:37"></i><i style="--c:37"></i><i style="--c:37"></i><i style="--c:37"></i><i style="--c:38"></i><i style="--c:38"></i><i style="--c:38"></i><i style="--c:38"></i><i style="--c:38"></i><i style="--c:38"></i><i style="--c:38"></i><i style="--c:39"></i><i style="--c:39"></i><i style="--c:39"></i><i style="--c:39"></i><i style="--c:39"></i><i style="--c:39"></i><i style="--c:39"></i><i style="--c:40"></i><i style="--c:40"></i><i style="--c:40"></i><i style="--c:40"></i><i style="--c:40"></i><i style="--c:40"></i><i style="--c:40"></i><i class="a" style="--c:41"></i><i class="a" style="--c:41"></i><i class="a" style="--c:41"></i><i class="a" style="--c:41"></i><i class="a" style="--c:41"></i><i class="a o" style="--c:41"></i><i class="a o" style="--c:41"></i><i style="--c:42"></i><i style="--c:42"></i><i style="--c:42"></i><i style="--c:42"></i><i style="--c:42"></i><i style="--c:42"></i><i style="--c:42"></i><i style="--c:43"></i><i style="--c:43"></i><i style="--c:43"></i><i style="--c:43"></i><i style="--c:43"></i><i style="--c:43"></i><i style="--c:43"></i><i style="--c:44"></i><i style="--c:44"></i><i style="--c:44"></i><i style="--c:44"></i><i style="--c:44"></i><i style="--c:44"></i><i style="--c:44"></i><i style="--c:45"></i><i style="--c:45"></i><i style="--c:45"></i><i style="--c:45"></i><i style="--c:45"></i><i style="--c:45"></i><i style="--c:45"></i><i style="--c:46"></i><i style="--c:46"></i><i style="--c:46"></i><i style="--c:46"></i><i style="--c:46"></i><i style="--c:46"></i><i style="--c:46"></i><i style="--c:47"></i><i style="--c:47"></i><i style="--c:47"></i><i style="--c:47"></i><i style="--c:47"></i><i style="--c:47"></i><i style="--c:47"></i><i style="--c:48"></i><i style="--c:48"></i><i style="--c:48"></i><i style="--c:48"></i><i style="--c:48"></i><i style="--c:48"></i><i style="--c:48"></i><i style="--c:49"></i><i style="--c:49"></i><i style="--c:49"></i><i style="--c:49"></i><i style="--c:49"></i><i style="--c:49"></i><i style="--c:49"></i><i style="--c:50"></i><i style="--c:50"></i><i style="--c:50"></i><i style="--c:50"></i><i style="--c:50"></i><i style="--c:50"></i><i style="--c:50"></i><i style="--c:51"></i><i style="--c:51"></i><i style="--c:51"></i><i style="--c:51"></i><i style="--c:51"></i><i style="--c:51"></i><i style="--c:51"></i><i style="--c:52"></i></div>
+      <div class="yb-scale"><span>Day 1</span><span>Day 365</span></div>
     </div>
+    <div class="yb-legend"><span><i></i>持續合規 358+ 天</span><span><i class="a"></i>審查 5–7 天</span></div>
   </div>
 </section>
 
@@ -554,19 +682,23 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
       <p>先釐清適用範圍及現行技術檢視，再依範圍複雜度、PCI Level、專案階段提供正式報價。</p>
       <div class="flow"><span class="hl">免費範圍界定</span><i>→</i><span class="hl">技術檢視</span><i>→</i><span>正式報價</span><i>→</i><span>啟動專案</span></div>
       <!-- 預約連結：取得 Google 日曆預約頁網址後，把 href="#booking" 換成該網址，並加上 target="_blank" rel="noopener" -->
-      <a class="btn-book" id="booking" href="#booking">預約時段 →</a>
     </div>
-    <div class="contact">
-      <div class="it"><span class="k">Email</span><span class="v">service@securevectors.com</span></div>
-      <div class="it"><span class="k">官網</span><a class="v" href="https://www.securevectors.com/contact-us" target="_blank" rel="noopener">securevectors.com/contact-us</a></div>
+    <div class="contact-box">
+      <div class="contact-icons">
+        <a class="ic-item" href="mailto:service@securevectors.com" aria-label="寄信給安律國際（service@securevectors.com）" title="Email：service@securevectors.com"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6 8.5-6"/></svg></span><span class="ic-lab">Email</span></a>
+        <a class="ic-item" href="https://www.securevectors.com/zh-hant/contact-us" target="_blank" rel="noopener" aria-label="前往安律國際官網聯絡頁" title="官網：securevectors.com"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z"/></svg></span><span class="ic-lab">官網</span></a>
+        <!-- 預約連結：取得 Google 日曆預約頁網址後，把 href="#booking" 換成該網址，並加上 target="_blank" rel="noopener" -->
+        <a class="ic-item" id="booking" href="#booking" aria-label="會議預約" title="會議預約"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h2M14 14h2M8 17h2"/></svg></span><span class="ic-lab">會議預約</span></a>
+      </div>
     </div>
   </div>
 </section>
 
+<dialog class="lb" id="lightbox" aria-label="圖片放大檢視"><button class="lb-close" type="button" aria-label="關閉">×</button><img id="lb-img" alt=""></dialog>
+
 <footer>
   <div class="wrap">
-    <span>Secure Vectors Information Technologies Inc. 安律國際 · 台北</span>
-    <span>畫面中的平台介面為示意，數值為範例。</span>
+    <span>© 2026 Secure Vectors Information Technologies Inc. All rights reserved.</span>
   </div>
 </footer>
 
@@ -588,6 +720,45 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
     if(navigator.clipboard&&navigator.clipboard.writeText){
       navigator.clipboard.writeText(t).then(function(){done('已複製');}).catch(selectFallback);
     }else{selectFallback();}
+  });
+})();
+</script>
+<script>
+(function(){
+  var dlg=document.getElementById('lightbox'),big=document.getElementById('lb-img');
+  if(dlg&&dlg.showModal){
+    document.querySelectorAll('.zoom').forEach(function(b){b.addEventListener('click',function(){var i=b.querySelector('img');big.src=i.currentSrc||i.src;big.alt=i.alt;dlg.showModal();});});
+    dlg.querySelector('.lb-close').addEventListener('click',function(){dlg.close();});
+    dlg.addEventListener('click',function(e){if(e.target===dlg)dlg.close();});
+  }
+})();
+(function(){
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce||!('IntersectionObserver' in window))return;
+  var v=document.getElementById('vdash'),b=document.getElementById('ybar'),n=document.getElementById('vcount');
+  [v,b].forEach(function(el){if(el)el.classList.add('anim');});
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){
+    if(!e.isIntersecting)return;
+    e.target.classList.add('on');io.unobserve(e.target);
+    if(e.target===v&&n){var t0=null;function step(t){if(!t0)t0=t;var p=Math.min((t-t0)/1400,1);n.textContent=Math.round(146*p);if(p<1)requestAnimationFrame(step);}requestAnimationFrame(step);}
+  });},{threshold:.35});
+  [v,b].forEach(function(el){if(el)io.observe(el);});
+})();
+</script>
+<script>
+(function(){
+  var viz=document.getElementById('collabViz'); if(!viz)return;
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce||!('IntersectionObserver' in window))return;
+  viz.classList.add('anim');
+  var started=false;
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){
+    if(e.isIntersecting&&!started){started=true;setTimeout(function(){viz.classList.add('on');},600);io.disconnect();}
+  });},{threshold:.5});
+  io.observe(viz);
+  viz.querySelector('.replay').addEventListener('click',function(){
+    viz.classList.remove('on');void viz.offsetWidth;
+    setTimeout(function(){viz.classList.add('on');},500);
   });
 })();
 </script>
